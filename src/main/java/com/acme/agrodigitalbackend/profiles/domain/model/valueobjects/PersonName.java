@@ -14,8 +14,8 @@ public record PersonName(String firstName, String lastName) {
             throw new IllegalArgumentException("Last name cannot be null or blank");
         }
     }
+
     public String getFullName() {
         return String.format("%s %s", firstName, lastName);
     }
 }
-
