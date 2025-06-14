@@ -8,7 +8,9 @@ public class UserResourceFromEntityAssembler {
         return new UserResource(
                 entity.getId(),
                 entity.getFullName(),
-                entity.getEmail()
+                entity.getEmail(),
+                entity.getPasswordValue(),
+                entity.getRole()
         );
     }
 }
