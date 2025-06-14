@@ -9,9 +9,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 
 public record CreateUserResource(
-        @NotBlank(message = "Full name is required")
-        @Size(min = 2, message = "Full name must be at least 2 characters long")
-        String fullName,
+        @NotBlank(message = "Name is required")
+        @Size(min = 2, message = "Name must be at least 2 characters long")
+        String name,
         
         @NotBlank(message = "Email is required")
         @Email(message = "Email must be valid")
@@ -21,6 +21,9 @@ public record CreateUserResource(
         @Size(min = 8, message = "Password must be at least 8 characters long")
         @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).+$", 
                 message = "Password must contain letters, numbers and symbols")
-        String password
+        String password,
+        
+        @NotBlank(message = "Role is required")
+        String role
 ) {
 }
