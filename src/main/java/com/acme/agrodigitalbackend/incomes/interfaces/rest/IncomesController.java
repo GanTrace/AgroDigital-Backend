@@ -1,5 +1,6 @@
 package com.acme.agrodigitalbackend.incomes.interfaces.rest;
 
+import com.acme.agrodigitalbackend.incomes.domain.model.commands.DeleteIncomeCommand;
 import com.acme.agrodigitalbackend.incomes.domain.model.queries.GetAllIncomesQuery;
 import com.acme.agrodigitalbackend.incomes.domain.model.queries.GetIncomeByIdQuery;
 import com.acme.agrodigitalbackend.incomes.domain.model.queries.GetIncomesByUserIdQuery;
@@ -81,5 +82,12 @@ public class IncomesController {
         var incomes = incomeQueryService.handle(getIncomesByUserIdQuery);
         var incomeResources = incomes.stream().map(IncomeResourceFromEntityAssembler::toResourceFromEntity).collect(Collectors.toList());
         return ResponseEntity.ok(incomeResources);
+    }
+
+    @DeleteMapping("/{incomeId}")
+    public ResponseEntity<Void> deleteIncome(@PathVariable Long incomeId) {
+        var deleteIncomeCommand = new DeleteIncomeCommand(incomeId);
+        incomeCommandService.handle(deleteIncomeCommand);
+        return ResponseEntity.noContent().build();
     }
 }

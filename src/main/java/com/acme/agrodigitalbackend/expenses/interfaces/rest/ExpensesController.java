@@ -1,5 +1,6 @@
 package com.acme.agrodigitalbackend.expenses.interfaces.rest;
 
+import com.acme.agrodigitalbackend.expenses.domain.model.commands.DeleteExpenseCommand;
 import com.acme.agrodigitalbackend.expenses.domain.model.queries.GetAllExpensesQuery;
 import com.acme.agrodigitalbackend.expenses.domain.model.queries.GetExpenseByIdQuery;
 import com.acme.agrodigitalbackend.expenses.domain.model.queries.GetExpensesByUserIdQuery;
@@ -81,5 +82,12 @@ public class ExpensesController {
         var expenses = expenseQueryService.handle(getExpensesByUserIdQuery);
         var expenseResources = expenses.stream().map(ExpenseResourceFromEntityAssembler::toResourceFromEntity).collect(Collectors.toList());
         return ResponseEntity.ok(expenseResources);
+    }
+
+    @DeleteMapping("/{expenseId}")
+    public ResponseEntity<Void> deleteExpense(@PathVariable Long expenseId) {
+        var deleteExpenseCommand = new DeleteExpenseCommand(expenseId);
+        expenseCommandService.handle(deleteExpenseCommand);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -2,6 +2,7 @@ package com.acme.agrodigitalbackend.incomes.application.internal.commandservices
 
 import com.acme.agrodigitalbackend.incomes.domain.model.aggregates.Income;
 import com.acme.agrodigitalbackend.incomes.domain.model.commands.CreateIncomeCommand;
+import com.acme.agrodigitalbackend.incomes.domain.model.commands.DeleteIncomeCommand;
 import com.acme.agrodigitalbackend.incomes.domain.services.IncomeCommandService;
 import com.acme.agrodigitalbackend.incomes.infrastructure.persistence.jpa.repositories.IncomeRepository;
 import org.springframework.stereotype.Service;
@@ -19,5 +20,10 @@ public class IncomeCommandServiceImpl implements IncomeCommandService {
         var income = new Income(command);
         incomeRepository.save(income);
         return income.getId();
+    }
+
+    @Override
+    public void handle(DeleteIncomeCommand command) {
+        incomeRepository.deleteById(command.incomeId());
     }
 }
