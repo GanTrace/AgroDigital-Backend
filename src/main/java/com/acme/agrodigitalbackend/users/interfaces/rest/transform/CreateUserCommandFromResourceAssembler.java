@@ -6,9 +6,10 @@ import com.acme.agrodigitalbackend.users.interfaces.rest.resources.CreateUserRes
 public class CreateUserCommandFromResourceAssembler {
     public static CreateUserCommand toCommandFromResource(CreateUserResource resource) {
         return new CreateUserCommand(
-                resource.fullName(),
+                resource.name(),
                 resource.email(),
-                resource.password()
+                resource.password(),
+                resource.role()
         );
     }
 }
