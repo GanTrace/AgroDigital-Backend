@@ -1,5 +1,6 @@
 package com.acme.agrodigitalbackend.events.interfaces.rest;
 
+import com.acme.agrodigitalbackend.events.domain.model.commands.DeleteEventCommand;
 import com.acme.agrodigitalbackend.events.domain.model.queries.GetAllEventsQuery;
 import com.acme.agrodigitalbackend.events.domain.model.queries.GetEventByIdQuery;
 import com.acme.agrodigitalbackend.events.domain.model.queries.GetEventsByCreatorIdQuery;
@@ -95,5 +96,12 @@ public class EventsController {
                 .map(EventResourceFromEntityAssembler::toResourceFromEntity)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(eventResources);
+    }
+
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long eventId) {
+        var deleteEventCommand = new DeleteEventCommand(eventId);
+        eventCommandService.handle(deleteEventCommand);
+        return ResponseEntity.noContent().build();
     }
 }
