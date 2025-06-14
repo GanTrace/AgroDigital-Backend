@@ -4,27 +4,26 @@ This is the backend for the AgroDigital application, built with Spring Boot and 
 
 ## Recent Changes
 
-### User Structure Simplification
+### Complete Application Implementation
 
-- **Modified User Structure**: Updated user fields to include `name`, `email`, `password`, and `role` as simple string fields.
-- **Simplified Field Names**: Changed from `fullName` to `name` for consistency with frontend requirements.
-- **Deleted `PersonName.java`**: The old `PersonName` value object has been removed from the users context.
-- **Removed Learning Context**: Completely eliminated the learning context including Students, Courses, and Enrollments to focus on core functionality.
+- **Multi-Context Architecture**: Implemented complete DDD architecture with Users, Animals, Events, Incomes, and Expenses contexts
+- **CRUD Operations**: Full Create, Read, Update, and Delete operations for all entities
+- **Profile Management**: Added profile image URL support and PATCH endpoint for user updates
+- **API Documentation**: Updated to "ACME AgroDigital Backend API" with proper descriptions
 
-### Key Changes Made
+### Key Features Implemented
 
-#### Domain Model Updates
+#### User Management
+- **User Profile Updates**: PATCH endpoint for updating user information including profile image URL
+- **Profile Image Support**: Users can now set profile images via URL
+- **Comprehensive Validation**: Enhanced validation for all user fields
 
-- **User Aggregate**: Now includes `name`, `email`, `password`, and `role` fields
-- **CreateUserCommand**: Modified to accept `name`, `email`, `password`, and `role`
-- Added `role` as a simple string field
-- Maintained `FullName` value object for internal consistency
-
-#### API Changes
-
-- **CreateUserResource**: Updated to include only essential fields with validations
-- **UserResource**: Updated to include `id`, `name`, `email`, `password`, and `role`
-- **Assemblers**: Updated to work with simplified field structure
+#### Multi-Domain Implementation
+- **Animals Context**: Complete animal management with creator tracking
+- **Events Context**: Event management system
+- **Incomes Context**: Financial income tracking
+- **Expenses Context**: Financial expense tracking
+- **DELETE Operations**: Implemented delete functionality across all contexts
 
 ### Database Changes
 
@@ -81,9 +80,11 @@ CREATE TABLE users (
 - Maven
 - Domain-Driven Design (DDD)
 
-## Users Context
-### Domain Model
-#### User Aggregate
+## Domain Contexts
+
+### Users Context
+#### Domain Model
+##### User Aggregate
 
 - **User**: Main aggregate representing a user in the system with the following fields:
   - **id**: Unique identifier (Long)
@@ -91,14 +92,90 @@ CREATE TABLE users (
   - **email**: User's email address (String)
   - **password**: User's password (String)
   - **role**: User's role (String)
+  - **profileImage**: URL for user's profile image (String, optional)
 - **FullName**: Value object for user's complete name (internal use)
 - **Password**: Value object with validation rules
 - **EmailAddress**: Value object for email validation
 
-#### Commands and Queries
+##### Commands and Queries
 - **CreateUserCommand**: Command to create a new user
+- **UpdateUserCommand**: Command to update user information (PATCH support)
 - **GetAllUsersQuery**: Query to retrieve all users
 - **GetUserByIdQuery**: Query to retrieve a user by ID
+
+### Animals Context
+#### Domain Model
+##### Animal Aggregate
+
+- **Animal**: Main aggregate representing an animal with the following fields:
+  - **id**: Unique identifier (Long)
+  - **name**: Animal's name (String)
+  - **species**: Animal species (String)
+  - **breed**: Animal breed (String)
+  - **birthDate**: Animal's birth date (LocalDate)
+  - **weight**: Animal's weight (BigDecimal)
+  - **createdBy**: ID of the user who created the record (Long)
+
+##### Commands and Queries
+- **CreateAnimalCommand**: Command to create a new animal
+- **DeleteAnimalCommand**: Command to delete an animal
+- **GetAllAnimalsQuery**: Query to retrieve all animals
+- **GetAnimalByIdQuery**: Query to retrieve an animal by ID
+- **GetAnimalsByCreatorQuery**: Query to retrieve animals by creator
+
+### Events Context
+#### Domain Model
+##### Event Aggregate
+
+- **Event**: Main aggregate representing an event with the following fields:
+  - **id**: Unique identifier (Long)
+  - **title**: Event title (String)
+  - **description**: Event description (String)
+  - **eventDate**: Date of the event (LocalDate)
+  - **userId**: ID of the user associated with the event (Long)
+  - **userName**: Name of the user associated with the event (String)
+
+##### Commands and Queries
+- **CreateEventCommand**: Command to create a new event
+- **DeleteEventCommand**: Command to delete an event
+- **GetAllEventsQuery**: Query to retrieve all events
+- **GetEventByIdQuery**: Query to retrieve an event by ID
+
+### Incomes Context
+#### Domain Model
+##### Income Aggregate
+
+- **Income**: Main aggregate representing an income with the following fields:
+  - **id**: Unique identifier (Long)
+  - **amount**: Income amount (BigDecimal)
+  - **description**: Income description (String)
+  - **incomeDate**: Date of the income (LocalDate)
+  - **userId**: ID of the user associated with the income (Long)
+  - **userName**: Name of the user associated with the income (String)
+
+##### Commands and Queries
+- **CreateIncomeCommand**: Command to create a new income
+- **DeleteIncomeCommand**: Command to delete an income
+- **GetAllIncomesQuery**: Query to retrieve all incomes
+- **GetIncomeByIdQuery**: Query to retrieve an income by ID
+
+### Expenses Context
+#### Domain Model
+##### Expense Aggregate
+
+- **Expense**: Main aggregate representing an expense with the following fields:
+  - **id**: Unique identifier (Long)
+  - **amount**: Expense amount (BigDecimal)
+  - **description**: Expense description (String)
+  - **expenseDate**: Date of the expense (LocalDate)
+  - **userId**: ID of the user associated with the expense (Long)
+  - **userName**: Name of the user associated with the expense (String)
+
+##### Commands and Queries
+- **CreateExpenseCommand**: Command to create a new expense
+- **DeleteExpenseCommand**: Command to delete an expense
+- **GetAllExpensesQuery**: Query to retrieve all expenses
+- **GetExpenseByIdQuery**: Query to retrieve an expense by ID
 
 ### Business Validations
 
@@ -120,7 +197,9 @@ CREATE TABLE users (
 - Cannot be null or blank
 - Must be at least 2 characters long
 
-### REST API Endpoints
+## REST API Endpoints
+
+### Users Endpoints
 
 #### Create User
 ```http
@@ -135,6 +214,20 @@ Content-Type: application/json
 }
 ```
 
+#### Update User (Profile Configuration)
+```http
+PATCH /api/v1/users/{id}
+Content-Type: application/json
+
+{
+  "name": "Juan Pérez García",
+  "email": "juan.perez.garcia@example.com",
+  "password": "NewSecurePass123!",
+  "role": "rancher",
+  "profileImage": "https://example.com/profile-image.jpg"
+}
+```
+
 #### Get All Users
 ```http
 GET /api/v1/users
@@ -145,14 +238,196 @@ GET /api/v1/users
 GET /api/v1/users/{id}
 ```
 
-### Response Format
+### Animals Endpoints
+
+#### Create Animal
+```http
+POST /api/v1/animals
+Content-Type: application/json
+
+{
+  "name": "Bessie",
+  "species": "Cow",
+  "breed": "Holstein",
+  "birthDate": "2020-05-15",
+  "weight": 450.5,
+  "createdBy": 1
+}
+```
+
+#### Get All Animals
+```http
+GET /api/v1/animals
+```
+
+#### Get Animal by ID
+```http
+GET /api/v1/animals/{id}
+```
+
+#### Get Animals by Creator
+```http
+GET /api/v1/animals/creator/{createdBy}
+```
+
+#### Delete Animal
+```http
+DELETE /api/v1/animals/{id}
+```
+
+### Events Endpoints
+
+#### Create Event
+```http
+POST /api/v1/events
+Content-Type: application/json
+
+{
+  "title": "Vaccination Schedule",
+  "description": "Annual vaccination for cattle",
+  "eventDate": "2024-06-15",
+  "userId": 1,
+  "userName": "Juan Pérez"
+}
+```
+
+#### Get All Events
+```http
+GET /api/v1/events
+```
+
+#### Get Event by ID
+```http
+GET /api/v1/events/{id}
+```
+
+#### Delete Event
+```http
+DELETE /api/v1/events/{id}
+```
+
+### Incomes Endpoints
+
+#### Create Income
+```http
+POST /api/v1/incomes
+Content-Type: application/json
+
+{
+  "amount": 1500.00,
+  "description": "Milk sales",
+  "incomeDate": "2024-01-15",
+  "userId": 1,
+  "userName": "Juan Pérez"
+}
+```
+
+#### Get All Incomes
+```http
+GET /api/v1/incomes
+```
+
+#### Get Income by ID
+```http
+GET /api/v1/incomes/{id}
+```
+
+#### Delete Income
+```http
+DELETE /api/v1/incomes/{id}
+```
+
+### Expenses Endpoints
+
+#### Create Expense
+```http
+POST /api/v1/expenses
+Content-Type: application/json
+
+{
+  "amount": 250.00,
+  "description": "Feed purchase",
+  "expenseDate": "2024-01-10",
+  "userId": 1,
+  "userName": "Juan Pérez"
+}
+```
+
+#### Get All Expenses
+```http
+GET /api/v1/expenses
+```
+
+#### Get Expense by ID
+```http
+GET /api/v1/expenses/{id}
+```
+
+#### Delete Expense
+```http
+DELETE /api/v1/expenses/{id}
+```
+
+### Response Formats
+
+#### User Response
 ```json
 {
   "id": 1,
   "name": "Juan Pérez",
   "email": "juan.perez@example.com",
   "password": "SecurePass123!",
-  "role": "rancher"
+  "role": "rancher",
+  "profileImage": "https://example.com/profile-image.jpg"
+}
+```
+
+#### Animal Response
+```json
+{
+  "id": 1,
+  "name": "Bessie",
+  "species": "Cow",
+  "breed": "Holstein",
+  "birthDate": "2020-05-15",
+  "weight": 450.5,
+  "createdBy": 1
+}
+```
+
+#### Event Response
+```json
+{
+  "id": 1,
+  "title": "Vaccination Schedule",
+  "description": "Annual vaccination for cattle",
+  "eventDate": "2024-06-15",
+  "userId": 1,
+  "userName": "Juan Pérez"
+}
+```
+
+#### Income Response
+```json
+{
+  "id": 1,
+  "amount": 1500.00,
+  "description": "Milk sales",
+  "incomeDate": "2024-01-15",
+  "userId": 1,
+  "userName": "Juan Pérez"
+}
+```
+
+#### Expense Response
+```json
+{
+  "id": 1,
+  "amount": 250.00,
+  "description": "Feed purchase",
+  "expenseDate": "2024-01-10",
+  "userId": 1,
+  "userName": "Juan Pérez"
 }
 ```
 
@@ -166,14 +441,56 @@ The application is configured to use MySQL database with the following settings:
 - **Password**: `password`
 - **Naming Strategy**: Snake case with pluralized table names
 
-### Table Structure
+### Database Tables
 
-The `users` table will be created with the following structure:
+#### Users Table
 - `id` (BIGINT, Primary Key, Auto Increment)
 - `full_name` (VARCHAR)
 - `email` (VARCHAR, Unique)
 - `password` (VARCHAR)
 - `role` (VARCHAR)
+- `profile_image_url` (VARCHAR, Nullable)
+- `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)
+
+#### Animals Table
+- `id` (BIGINT, Primary Key, Auto Increment)
+- `name` (VARCHAR)
+- `species` (VARCHAR)
+- `breed` (VARCHAR)
+- `birth_date` (DATE)
+- `weight` (DECIMAL)
+- `created_by` (BIGINT)
+- `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)
+
+#### Events Table
+- `id` (BIGINT, Primary Key, Auto Increment)
+- `title` (VARCHAR)
+- `description` (TEXT)
+- `event_date` (DATE)
+- `user_id` (BIGINT)
+- `user_name` (VARCHAR)
+- `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)
+
+#### Incomes Table
+- `id` (BIGINT, Primary Key, Auto Increment)
+- `amount` (DECIMAL)
+- `description` (VARCHAR)
+- `income_date` (DATE)
+- `user_id` (BIGINT)
+- `user_name` (VARCHAR)
+- `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)
+
+#### Expenses Table
+- `id` (BIGINT, Primary Key, Auto Increment)
+- `amount` (DECIMAL)
+- `description` (VARCHAR)
+- `expense_date` (DATE)
+- `user_id` (BIGINT)
+- `user_name` (VARCHAR)
 - `created_at` (TIMESTAMP)
 - `updated_at` (TIMESTAMP)
 
