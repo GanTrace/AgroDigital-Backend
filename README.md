@@ -368,6 +368,43 @@ GET /api/v1/expenses/{id}
 DELETE /api/v1/expenses/{id}
 ```
 
+### Patients Endpoints
+
+#### Create Patient
+```http
+POST /api/v1/patients
+Content-Type: application/json
+
+{
+  "name": "Bessie",
+  "type": "Vaca Holstein",
+  "age": "3 años",
+  "gender": "Hembra",
+  "healthIssues": "problemas respiratorios",
+  "owner": "Juan Pérez",
+  "lastVisit": "2024-01-15",
+  "nextVisit": "2024-02-15",
+  "image": "https://example.com/cow-image.jpg",
+  "observations": "Animal en buen estado general, requiere seguimiento",
+  "createdBy": 2
+}
+```
+
+#### Get All Patients
+```http
+GET /api/v1/patients
+```
+
+#### Get Patient by ID
+```http
+GET /api/v1/patients/{id}
+```
+
+#### Delete Patient
+```http
+DELETE /api/v1/patients/{id}
+```
+
 ### Response Formats
 
 #### User Response
@@ -431,6 +468,24 @@ DELETE /api/v1/expenses/{id}
 }
 ```
 
+#### Patient Response
+```json
+{
+  "id": 1,
+  "name": "Bessie",
+  "type": "Vaca Holstein",
+  "age": "3 años",
+  "gender": "Hembra",
+  "healthIssues": "problemas respiratorios",
+  "owner": "Juan Pérez",
+  "lastVisit": "2024-01-15",
+  "nextVisit": "2024-02-15",
+  "image": "https://example.com/cow-image.jpg",
+  "observations": "Animal en buen estado general, requiere seguimiento",
+  "createdBy": 2
+}
+```
+
 ## Database Configuration
 
 The application is configured to use MySQL database with the following settings:
@@ -491,6 +546,22 @@ The application is configured to use MySQL database with the following settings:
 - `expense_date` (DATE)
 - `user_id` (BIGINT)
 - `user_name` (VARCHAR)
+- `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)
+
+#### Patients Table
+- `id` (BIGINT, Primary Key, Auto Increment)
+- `name` (VARCHAR)
+- `type` (VARCHAR) - Options: Vaca Holstein, Toro Angus, Cabra Alpina, Oveja Merino, Caballo Andaluz
+- `age` (VARCHAR)
+- `gender` (VARCHAR) - Options: Macho, Hembra
+- `health_issues` (VARCHAR) - Options: problemas respiratorios, cojera leve, infección, otro
+- `owner` (VARCHAR)
+- `last_visit` (DATE)
+- `next_visit` (DATE)
+- `image` (VARCHAR, Nullable)
+- `observations` (TEXT, Nullable)
+- `created_by` (BIGINT)
 - `created_at` (TIMESTAMP)
 - `updated_at` (TIMESTAMP)
 
