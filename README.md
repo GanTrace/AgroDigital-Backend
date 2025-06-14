@@ -6,23 +6,24 @@ This is the backend for the AgroDigital application, built with Spring Boot and 
 
 ### User Structure Simplification
 
-- **Removed `firstName` and `lastName`**: These fields have been replaced with a single `fullName` field using the `FullName` value object.
+- **Modified User Structure**: Updated user fields to include `name`, `email`, `password`, and `role` as simple string fields.
+- **Simplified Field Names**: Changed from `fullName` to `name` for consistency with frontend requirements.
 - **Deleted `PersonName.java`**: The old `PersonName` value object has been removed from the users context.
-- **Removed Role System**: Eliminated the `UserRole` system and all role-related functionality to simplify the user structure.
 - **Removed Learning Context**: Completely eliminated the learning context including Students, Courses, and Enrollments to focus on core functionality.
 
-### Domain Layer Changes
+### Key Changes Made
 
-- **User Aggregate**: Simplified to use only `FullName`, `EmailAddress`, and `Password`
-- **CreateUserCommand**: Modified to accept only `fullName`, `email`, and `password`
-- **Value Objects**: 
-  - Added `FullName` record with validation
-  - Removed `UserRole` completely
+#### Domain Model Updates
 
-### Interface Layer Changes
+- **User Aggregate**: Now includes `name`, `email`, `password`, and `role` fields
+- **CreateUserCommand**: Modified to accept `name`, `email`, `password`, and `role`
+- Added `role` as a simple string field
+- Maintained `FullName` value object for internal consistency
+
+#### API Changes
 
 - **CreateUserResource**: Updated to include only essential fields with validations
-- **UserResource**: Simplified to include only `id`, `fullName`, and `email`
+- **UserResource**: Updated to include `id`, `name`, `email`, `password`, and `role`
 - **Assemblers**: Updated to work with simplified field structure
 
 ### Database Changes
@@ -48,26 +49,29 @@ CREATE TABLE users (
 
 ```json
 {
-  "fullName": "Juan Pérez García",
+  "name": "Juan Pérez García",
   "email": "juan.perez@example.com",
-  "password": "SecurePass123!"
+  "password": "SecurePass123!",
+  "role": "veterinarian"
 }
 ```
 
-**Response:**
+**Response (201 Created):**
 ```json
 {
   "id": 1,
-  "fullName": "Juan Pérez García",
-  "email": "juan.perez@example.com"
+  "name": "Juan Pérez García",
+  "email": "juan.perez@example.com",
+  "password": "SecurePass123!",
+  "role": "veterinarian"
 }
 ```
 
-## Validation Rules
-
-- **fullName**: Required, minimum 2 characters
+#### Field Validations
+- **name**: Required, minimum 2 characters
 - **email**: Required, valid email format
 - **password**: Required, minimum 8 characters, must contain letters, numbers, and symbols
+- **role**: Required, string value
 
 ## Technologies Used
 
@@ -78,15 +82,16 @@ CREATE TABLE users (
 - Domain-Driven Design (DDD)
 
 ## Users Context
-
 ### Domain Model
-
 #### User Aggregate
-- **User**: Main aggregate representing a user in the system
-- **FullName**: Value object for user's complete name
-- **UserRole**: Value object for user roles with ID-based identification:
-  - ID `0`: GANADERO (Rancher)
-  - ID `1`: VETERINARIO (Veterinarian)
+
+- **User**: Main aggregate representing a user in the system with the following fields:
+  - **id**: Unique identifier (Long)
+  - **name**: User's full name (String)
+  - **email**: User's email address (String)
+  - **password**: User's password (String)
+  - **role**: User's role (String)
+- **FullName**: Value object for user's complete name (internal use)
 - **Password**: Value object with validation rules
 - **EmailAddress**: Value object for email validation
 
@@ -123,10 +128,10 @@ POST /api/v1/users
 Content-Type: application/json
 
 {
-  "fullName": "Juan Pérez",
+  "name": "Juan Pérez",
   "email": "juan.perez@example.com",
   "password": "SecurePass123!",
-  "roleId": 0
+  "role": "rancher"
 }
 ```
 
@@ -144,10 +149,10 @@ GET /api/v1/users/{id}
 ```json
 {
   "id": 1,
-  "fullName": "Juan Pérez",
+  "name": "Juan Pérez",
   "email": "juan.perez@example.com",
-  "roleId": 0,
-  "roleName": "GANADERO"
+  "password": "SecurePass123!",
+  "role": "rancher"
 }
 ```
 
@@ -168,7 +173,7 @@ The `users` table will be created with the following structure:
 - `full_name` (VARCHAR)
 - `email` (VARCHAR, Unique)
 - `password` (VARCHAR)
-- `role_id` (INTEGER)
+- `role` (VARCHAR)
 - `created_at` (TIMESTAMP)
 - `updated_at` (TIMESTAMP)
 
@@ -221,27 +226,27 @@ Once the application is running, you can access the interactive API documentatio
 
 ## Example Usage
 
-### Creating a Rancher (GANADERO)
+### Creating a Rancher
 ```bash
 curl -X POST http://localhost:8080/api/v1/users \
   -H "Content-Type: application/json" \
   -d '{
-    "fullName": "Carlos Rodriguez",
+    "name": "Carlos Rodriguez",
     "email": "carlos.rodriguez@ranch.com",
     "password": "SecurePass123!",
-    "roleId": 0
+    "role": "rancher"
   }'
 ```
 
-### Creating a Veterinarian (VETERINARIO)
+### Creating a Veterinarian
 ```bash
 curl -X POST http://localhost:8080/api/v1/users \
   -H "Content-Type: application/json" \
   -d '{
-    "fullName": "Dr. Maria Lopez",
+    "name": "Dr. Maria Lopez",
     "email": "maria.lopez@vet.com",
     "password": "VetPass456#",
-    "roleId": 1
+    "role": "veterinarian"
   }'
 ```
 
