@@ -1,5 +1,6 @@
 package com.acme.agrodigitalbackend.animals.interfaces.rest;
 
+import com.acme.agrodigitalbackend.animals.domain.model.commands.DeleteAnimalCommand;
 import com.acme.agrodigitalbackend.animals.domain.model.queries.GetAllAnimalsQuery;
 import com.acme.agrodigitalbackend.animals.domain.model.queries.GetAnimalByIdQuery;
 import com.acme.agrodigitalbackend.animals.domain.model.queries.GetAnimalsByCreatorQuery;
@@ -90,5 +91,12 @@ public class AnimalsController {
                 .map(AnimalResourceFromEntityAssembler::toResourceFromEntity)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(animalResources);
+    }
+
+    @DeleteMapping("/{animalId}")
+    public ResponseEntity<Void> deleteAnimal(@PathVariable Long animalId) {
+        var deleteAnimalCommand = new DeleteAnimalCommand(animalId);
+        animalCommandService.handle(deleteAnimalCommand);
+        return ResponseEntity.noContent().build();
     }
 }

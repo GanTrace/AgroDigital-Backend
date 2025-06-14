@@ -15,14 +15,14 @@ public class OpenApiConfiguration {
         var openApi = new OpenAPI();
         openApi
                 .info(new Info()
-                        .title("ACME Learning Platform API")
-                        .description("ACME Learning Platform application REST API documentation.")
+                        .title("ACME AgroDigital Backend API")
+                        .description("AgroDigital Backend")
                         .version("v1.0.0")
                         .license(new License().name("Apache 2.0")
                                 .url("https://springdoc.org")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("ACME Learning Platform wiki Documentation")
-                        .url("https://acme-learning-platform.wiki.github.io/docs"));
+                        .description("ACME AgroDigital Backend wiki Documentation")
+                        .url("https://acme-agrodigital-backend.wiki.github.io/docs"));
         return openApi;
     }
 }
