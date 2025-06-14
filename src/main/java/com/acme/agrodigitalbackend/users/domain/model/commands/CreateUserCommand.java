@@ -1,4 +1,4 @@
 package com.acme.agrodigitalbackend.users.domain.model.commands;
 
-public record CreateUserCommand(String fullName, String email, String password) {
+public record CreateUserCommand(String name, String email, String password, String role) {
 }
