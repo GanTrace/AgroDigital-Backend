@@ -10,7 +10,8 @@ public class UserResourceFromEntityAssembler {
                 entity.getFullName(),
                 entity.getEmail(),
                 entity.getPasswordValue(),
-                entity.getRole()
+                entity.getRole(),
+                entity.getProfileImageUrl()
         );
     }
 }
