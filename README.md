@@ -405,6 +405,42 @@ GET /api/v1/patients/{id}
 DELETE /api/v1/patients/{id}
 ```
 
+### Appointments Endpoints
+
+#### Create Appointment
+```http
+POST /api/v1/appointments
+Content-Type: application/json
+
+{
+  "patientId": 1,
+  "patientName": "Luna",
+  "ownerName": "Rodrigo",
+  "date": "2025-06-13",
+  "time": "09:30",
+  "reason": "Chequeo Mensual",
+  "status": "scheduled",
+  "notes": "ninguna.",
+  "createdBy": 5
+}
+```
+
+#### Get All Appointments
+```http
+GET /api/v1/appointments
+```
+
+#### Get Appointment by ID
+```http
+GET /api/v1/appointments/{id}
+```
+
+
+#### Delete Appointment
+```http
+DELETE /api/v1/appointments/{id}
+```
+
 ### Response Formats
 
 #### User Response
@@ -486,6 +522,22 @@ DELETE /api/v1/patients/{id}
 }
 ```
 
+#### Appointment Response
+```json
+{
+  "id": 1,
+  "patientId": 1,
+  "patientName": "Luna",
+  "ownerName": "Rodrigo",
+  "date": "2025-06-13",
+  "time": "09:30",
+  "reason": "Chequeo Mensual",
+  "status": "scheduled",
+  "notes": "ninguna.",
+  "createdBy": 5
+}
+```
+
 ## Database Configuration
 
 The application is configured to use MySQL database with the following settings:
@@ -561,6 +613,20 @@ The application is configured to use MySQL database with the following settings:
 - `next_visit` (DATE)
 - `image` (VARCHAR, Nullable)
 - `observations` (TEXT, Nullable)
+- `created_by` (BIGINT)
+- `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)
+
+#### Appointments Table
+- `id` (BIGINT, Primary Key, Auto Increment)
+- `patient_id` (BIGINT, Foreign Key to Patients)
+- `patient_name` (VARCHAR)
+- `owner_name` (VARCHAR)
+- `date` (DATE)
+- `time` (TIME)
+- `reason` (VARCHAR)
+- `status` (VARCHAR) - Options: scheduled, completed, cancelled
+- `notes` (TEXT, Nullable)
 - `created_by` (BIGINT)
 - `created_at` (TIMESTAMP)
 - `updated_at` (TIMESTAMP)
