@@ -5,8 +5,10 @@ import com.acme.agrodigitalbackend.users.domain.model.queries.GetUserByIdQuery;
 import com.acme.agrodigitalbackend.users.domain.services.UserCommandService;
 import com.acme.agrodigitalbackend.users.domain.services.UserQueryService;
 import com.acme.agrodigitalbackend.users.interfaces.rest.resources.CreateUserResource;
+import com.acme.agrodigitalbackend.users.interfaces.rest.resources.UpdateUserResource;
 import com.acme.agrodigitalbackend.users.interfaces.rest.resources.UserResource;
 import com.acme.agrodigitalbackend.users.interfaces.rest.transform.CreateUserCommandFromResourceAssembler;
+import com.acme.agrodigitalbackend.users.interfaces.rest.transform.UpdateUserCommandFromResourceAssembler;
 import com.acme.agrodigitalbackend.users.interfaces.rest.transform.UserResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -77,6 +79,23 @@ public class UsersController {
     public ResponseEntity<UserResource> getUserById(@PathVariable Long userId) {
         var getUserByIdQuery = new GetUserByIdQuery(userId);
         var user = userQueryService.handle(getUserByIdQuery);
+        if (user.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var userResource = UserResourceFromEntityAssembler.toResourceFromEntity(user.get());
+        return ResponseEntity.ok(userResource);
+    }
+
+    /**
+     * Updates an existing user
+     * @param userId the ID of the user to update
+     * @param updateUserResource the resource containing the updated user data
+     * @return the updated user resource
+     */
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserResource> updateUser(@PathVariable Long userId, @Valid @RequestBody UpdateUserResource updateUserResource) {
+        var updateUserCommand = UpdateUserCommandFromResourceAssembler.toCommandFromResource(userId, updateUserResource);
+        var user = userCommandService.handle(updateUserCommand);
         if (user.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
