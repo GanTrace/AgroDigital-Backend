@@ -441,6 +441,43 @@ GET /api/v1/appointments/{id}
 DELETE /api/v1/appointments/{id}
 ```
 
+### Medical Records Endpoints
+
+#### Create Medical Record
+```http
+POST /api/v1/medical-records
+Content-Type: application/json
+
+{
+  "patientId": 1,
+  "patientName": "Luna",
+  "ownerName": "Rodrigo",
+  "date": "2025-06-04",
+  "recordType": "Vacunación",
+  "diagnosis": "Gripe - Influenza",
+  "treatment": "Medicina",
+  "notes": "Tomar cada 8 horas",
+  "followUp": "2025-06-14",
+  "attachments": [],
+  "createdBy": 5
+}
+```
+
+#### Get All Medical Records
+```http
+GET /api/v1/medical-records
+```
+
+#### Get Medical Record by ID
+```http
+GET /api/v1/medical-records/{id}
+```
+
+#### Delete Medical Record
+```http
+DELETE /api/v1/medical-records/{id}
+```
+
 ### Response Formats
 
 #### User Response
@@ -535,6 +572,25 @@ DELETE /api/v1/appointments/{id}
   "status": "scheduled",
   "notes": "ninguna.",
   "createdBy": 5
+}
+```
+
+#### Medical Record Response
+```json
+{
+  "id": 1,
+  "patientId": 1,
+  "patientName": "Luna",
+  "ownerName": "Rodrigo",
+  "date": "2025-06-04",
+  "recordType": "Vacunación",
+  "diagnosis": "Gripe - Influenza",
+  "treatment": "Medicina",
+  "notes": "Tomar cada 8 horas",
+  "followUp": "2025-06-14",
+  "attachments": [],
+  "createdBy": 5,
+  "createdAt": "2025-06-05T01:00:15.590Z"
 }
 ```
 
