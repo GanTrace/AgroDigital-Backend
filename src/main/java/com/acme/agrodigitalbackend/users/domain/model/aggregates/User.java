@@ -27,6 +27,9 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     @Column(name = "role")
     private String role;
 
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
     public User() {
     }
 
@@ -35,6 +38,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.email = new EmailAddress(email);
         this.password = new Password(password);
         this.role = role;
+        this.profileImageUrl = null;
     }
 
     public User(CreateUserCommand command) {
@@ -42,6 +46,7 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         this.email = new EmailAddress(command.email());
         this.password = new Password(command.password());
         this.role = command.role();
+        this.profileImageUrl = null;
     }
 
     public void updateFullName(String fullName) {
@@ -58,6 +63,10 @@ public class User extends AuditableAbstractAggregateRoot<User> {
 
     public void updateRole(String role) {
         this.role = role;
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     // Getters
@@ -89,5 +98,8 @@ public class User extends AuditableAbstractAggregateRoot<User> {
         return password.password();
     }
 
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
 
 }
