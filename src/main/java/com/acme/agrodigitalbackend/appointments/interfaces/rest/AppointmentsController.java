@@ -3,20 +3,20 @@ package com.acme.agrodigitalbackend.appointments.interfaces.rest;
 import com.acme.agrodigitalbackend.appointments.domain.model.commands.DeleteAppointmentCommand;
 import com.acme.agrodigitalbackend.appointments.domain.model.queries.GetAllAppointmentsQuery;
 import com.acme.agrodigitalbackend.appointments.domain.model.queries.GetAppointmentByIdQuery;
+import com.acme.agrodigitalbackend.appointments.domain.model.queries.GetAppointmentsByCreatorQuery;
 import com.acme.agrodigitalbackend.appointments.domain.services.AppointmentCommandService;
 import com.acme.agrodigitalbackend.appointments.domain.services.AppointmentQueryService;
-import com.acme.agrodigitalbackend.appointments.interfaces.rest.resources.CreateAppointmentResource;
 import com.acme.agrodigitalbackend.appointments.interfaces.rest.resources.AppointmentResource;
-import com.acme.agrodigitalbackend.appointments.interfaces.rest.transform.CreateAppointmentCommandFromResourceAssembler;
+import com.acme.agrodigitalbackend.appointments.interfaces.rest.resources.CreateAppointmentResource;
 import com.acme.agrodigitalbackend.appointments.interfaces.rest.transform.AppointmentResourceFromEntityAssembler;
+import com.acme.agrodigitalbackend.appointments.interfaces.rest.transform.CreateAppointmentCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE })
 @RestController
@@ -54,6 +54,16 @@ public class AppointmentsController {
         var appointmentResources = appointments.stream()
                 .map(AppointmentResourceFromEntityAssembler::toResourceFromEntity)
                 .toList();
+        return ResponseEntity.ok(appointmentResources);
+    }
+
+    @GetMapping("/creator/{createdBy}")
+    public ResponseEntity<List<AppointmentResource>> getAppointmentsByCreator(@PathVariable Long createdBy) {
+        var getAppointmentsByCreatorQuery = new GetAppointmentsByCreatorQuery(createdBy);
+        var appointments = appointmentQueryService.handle(getAppointmentsByCreatorQuery);
+        var appointmentResources = appointments.stream()
+                .map(AppointmentResourceFromEntityAssembler::toResourceFromEntity)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(appointmentResources);
     }
 
