@@ -50,7 +50,7 @@ public class EventsController {
         }
         
         var user = userOptional.get();
-        if (!"RANCHER".equals(user.getRole())) {
+        if (!"rancher".equals(user.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         
