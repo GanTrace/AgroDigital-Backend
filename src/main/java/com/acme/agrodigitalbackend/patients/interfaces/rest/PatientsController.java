@@ -3,6 +3,7 @@ package com.acme.agrodigitalbackend.patients.interfaces.rest;
 import com.acme.agrodigitalbackend.patients.domain.model.commands.DeletePatientCommand;
 import com.acme.agrodigitalbackend.patients.domain.model.queries.GetAllPatientsQuery;
 import com.acme.agrodigitalbackend.patients.domain.model.queries.GetPatientByIdQuery;
+import com.acme.agrodigitalbackend.patients.domain.model.queries.GetPatientsByCreatorQuery;
 import com.acme.agrodigitalbackend.patients.domain.services.PatientCommandService;
 import com.acme.agrodigitalbackend.patients.domain.services.PatientQueryService;
 import com.acme.agrodigitalbackend.patients.interfaces.rest.resources.CreatePatientResource;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE })
 @RestController
@@ -66,6 +68,16 @@ public class PatientsController {
         }
         var patientResource = PatientResourceFromEntityAssembler.toResourceFromEntity(patient.get());
         return ResponseEntity.ok(patientResource);
+    }
+
+    @GetMapping("/creator/{createdBy}")
+    public ResponseEntity<List<PatientResource>> getPatientsByCreator(@PathVariable Long createdBy) {
+        var getPatientsByCreatorQuery = new GetPatientsByCreatorQuery(createdBy);
+        var patients = patientQueryService.handle(getPatientsByCreatorQuery);
+        var patientResources = patients.stream()
+                .map(PatientResourceFromEntityAssembler::toResourceFromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(patientResources);
     }
 
     @DeleteMapping("/{patientId}")
