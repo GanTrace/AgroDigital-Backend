@@ -2,6 +2,7 @@ package com.acme.agrodigitalbackend.users.interfaces.rest;
 
 import com.acme.agrodigitalbackend.users.domain.model.queries.GetAllUsersQuery;
 import com.acme.agrodigitalbackend.users.domain.model.queries.GetUserByIdQuery;
+import com.acme.agrodigitalbackend.users.domain.model.queries.GetUsersByRoleQuery;
 import com.acme.agrodigitalbackend.users.domain.services.UserCommandService;
 import com.acme.agrodigitalbackend.users.domain.services.UserQueryService;
 import com.acme.agrodigitalbackend.users.interfaces.rest.resources.CreateUserResource;
@@ -65,6 +66,21 @@ public class UsersController {
     public ResponseEntity<List<UserResource>> getAllUsers() {
         var getAllUsersQuery = new GetAllUsersQuery();
         var users = userQueryService.handle(getAllUsersQuery);
+        var userResources = users.stream()
+                .map(UserResourceFromEntityAssembler::toResourceFromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userResources);
+    }
+
+    /**
+     * Gets users by role
+     * @param role the role to filter by
+     * @return the list of users with the specified role
+     */
+    @GetMapping("/role/{role}")
+    public ResponseEntity<List<UserResource>> getUsersByRole(@PathVariable String role) {
+        var getUsersByRoleQuery = new GetUsersByRoleQuery(role);
+        var users = userQueryService.handle(getUsersByRoleQuery);
         var userResources = users.stream()
                 .map(UserResourceFromEntityAssembler::toResourceFromEntity)
                 .collect(Collectors.toList());
