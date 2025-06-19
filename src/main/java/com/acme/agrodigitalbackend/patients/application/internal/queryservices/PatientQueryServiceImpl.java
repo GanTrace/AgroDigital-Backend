@@ -3,6 +3,7 @@ package com.acme.agrodigitalbackend.patients.application.internal.queryservices;
 import com.acme.agrodigitalbackend.patients.domain.model.aggregates.Patient;
 import com.acme.agrodigitalbackend.patients.domain.model.queries.GetAllPatientsQuery;
 import com.acme.agrodigitalbackend.patients.domain.model.queries.GetPatientByIdQuery;
+import com.acme.agrodigitalbackend.patients.domain.model.queries.GetPatientsByCreatorQuery;
 import com.acme.agrodigitalbackend.patients.domain.services.PatientQueryService;
 import com.acme.agrodigitalbackend.patients.infrastructure.persistence.jpa.repositories.PatientRepository;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,10 @@ public class PatientQueryServiceImpl implements PatientQueryService {
     @Override
     public Optional<Patient> handle(GetPatientByIdQuery query) {
         return patientRepository.findById(query.patientId());
+    }
+
+    @Override
+    public List<Patient> handle(GetPatientsByCreatorQuery query) {
+        return patientRepository.findByCreatedBy(query.createdBy());
     }
 }

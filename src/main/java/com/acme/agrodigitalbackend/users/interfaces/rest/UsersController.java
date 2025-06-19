@@ -2,6 +2,7 @@ package com.acme.agrodigitalbackend.users.interfaces.rest;
 
 import com.acme.agrodigitalbackend.users.domain.model.queries.GetAllUsersQuery;
 import com.acme.agrodigitalbackend.users.domain.model.queries.GetUserByIdQuery;
+import com.acme.agrodigitalbackend.users.domain.model.queries.GetUsersByRoleQuery;
 import com.acme.agrodigitalbackend.users.domain.services.UserCommandService;
 import com.acme.agrodigitalbackend.users.domain.services.UserQueryService;
 import com.acme.agrodigitalbackend.users.interfaces.rest.resources.CreateUserResource;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/v1/users", produces = MediaType.APPLICATION_JSON_VALUE)
-@CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH })
+@CrossOrigin(origins = "*")
 @Tag(name = "Users", description = "User Management Endpoints")
 public class UsersController {
 
@@ -72,6 +73,21 @@ public class UsersController {
     }
 
     /**
+     * Gets users by role
+     * @param role the role to filter by
+     * @return the list of users with the specified role
+     */
+    @GetMapping("/role/{role}")
+    public ResponseEntity<List<UserResource>> getUsersByRole(@PathVariable String role) {
+        var getUsersByRoleQuery = new GetUsersByRoleQuery(role);
+        var users = userQueryService.handle(getUsersByRoleQuery);
+        var userResources = users.stream()
+                .map(UserResourceFromEntityAssembler::toResourceFromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userResources);
+    }
+
+    /**
      * Gets a user by id
      * @param userId the user id
      * @return the user resource
@@ -93,7 +109,7 @@ public class UsersController {
      * @param updateUserResource the resource containing the updated user data
      * @return the updated user resource
      */
-    @PatchMapping("/{userId}")
+    @PutMapping("/{userId}")
     public ResponseEntity<UserResource> updateUser(@PathVariable Long userId, @Valid @RequestBody UpdateUserResource updateUserResource) {
         var updateUserCommand = UpdateUserCommandFromResourceAssembler.toCommandFromResource(userId, updateUserResource);
         var user = userCommandService.handle(updateUserCommand);

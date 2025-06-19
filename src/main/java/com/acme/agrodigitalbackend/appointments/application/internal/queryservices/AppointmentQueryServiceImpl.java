@@ -3,6 +3,7 @@ package com.acme.agrodigitalbackend.appointments.application.internal.queryservi
 import com.acme.agrodigitalbackend.appointments.domain.model.aggregates.Appointment;
 import com.acme.agrodigitalbackend.appointments.domain.model.queries.GetAllAppointmentsQuery;
 import com.acme.agrodigitalbackend.appointments.domain.model.queries.GetAppointmentByIdQuery;
+import com.acme.agrodigitalbackend.appointments.domain.model.queries.GetAppointmentsByCreatorQuery;
 import com.acme.agrodigitalbackend.appointments.domain.services.AppointmentQueryService;
 import com.acme.agrodigitalbackend.appointments.infrastructure.persistence.jpa.repositories.AppointmentRepository;
 import org.springframework.stereotype.Service;
@@ -26,5 +27,10 @@ public class AppointmentQueryServiceImpl implements AppointmentQueryService {
     @Override
     public Optional<Appointment> handle(GetAppointmentByIdQuery query) {
         return appointmentRepository.findById(query.appointmentId());
+    }
+
+    @Override
+    public List<Appointment> handle(GetAppointmentsByCreatorQuery query) {
+        return appointmentRepository.findByCreatedBy(query.createdBy());
     }
 }

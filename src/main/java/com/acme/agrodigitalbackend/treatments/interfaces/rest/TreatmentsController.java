@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,24 +41,30 @@ public class TreatmentsController {
     }
 
     @PostMapping
-    public ResponseEntity<TreatmentResource> createTreatment(@RequestBody CreateTreatmentResource createTreatmentResource) {
-        // Verificar que el usuario existe
-        var userQuery = new GetUserByIdQuery(createTreatmentResource.createdBy());
-        var userOptional = userQueryService.handle(userQuery);
-        
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<TreatmentResource> createTreatment(@Valid @RequestBody CreateTreatmentResource createTreatmentResource) {
+        try {
+            // Verificar que el usuario existe
+            var userQuery = new GetUserByIdQuery(createTreatmentResource.createdBy());
+            var userOptional = userQueryService.handle(userQuery);
+            
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            var createTreatmentCommand = CreateTreatmentCommandFromResourceAssembler.toCommandFromResource(createTreatmentResource);
+            var treatment = treatmentCommandService.handle(createTreatmentCommand);
+            
+            if (treatment.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            var treatmentResource = TreatmentResourceFromEntityAssembler.toResourceFromEntity(treatment.get());
+            return new ResponseEntity<>(treatmentResource, HttpStatus.CREATED);
+        } catch (Exception e) {
+            System.err.println("Error creating treatment: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        
-        var createTreatmentCommand = CreateTreatmentCommandFromResourceAssembler.toCommandFromResource(createTreatmentResource);
-        var treatment = treatmentCommandService.handle(createTreatmentCommand);
-        
-        if (treatment.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        
-        var treatmentResource = TreatmentResourceFromEntityAssembler.toResourceFromEntity(treatment.get());
-        return new ResponseEntity<>(treatmentResource, HttpStatus.CREATED);
     }
 
     @GetMapping
