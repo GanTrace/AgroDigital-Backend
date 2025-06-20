@@ -2,19 +2,29 @@ package com.acme.agrodigitalbackend.shared.infrastructure.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
+
+    @Autowired(required = false)
+    private AuthenticationEntryPoint unauthorizedRequestHandler;
+    
+    @Autowired(required = false)
+    private Object authorizationRequestFilter;
 
     /**
      * This method creates the security filter chain.
@@ -25,14 +35,15 @@ public class WebSecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // Configure CORS
         http.cors(configurer -> configurer.configurationSource(corsConfigurationSource()));
         
-        // Disable CSRF for API endpoints
-        http.csrf(csrfConfigurer -> csrfConfigurer.disable())
-                // Configure session management
-                .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Configure authorization
+        http.csrf(csrfConfigurer -> csrfConfigurer.disable());
+        
+        if (unauthorizedRequestHandler != null) {
+            http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedRequestHandler));
+        }
+        
+        http.sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(
                                 "/api/v1/authentication/**",
@@ -40,21 +51,31 @@ public class WebSecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
-                                "/webjars/**",
-                                "/api/**").permitAll() // Allow all API endpoints for now
-                        .anyRequest().permitAll()); // Temporarily allow all requests for testing
+                                "/webjars/**").permitAll()
+                        .anyRequest().authenticated());
+
+        // Add authentication provider if available
+        try {
+            http.authenticationProvider(authenticationProvider());
+        } catch (Exception e) {
+            // If authenticationProvider is not available, continue without it
+        }
         
+        // Add authorization filter if available
+        if (authorizationRequestFilter != null && authorizationRequestFilter instanceof jakarta.servlet.Filter) {
+            http.addFilterBefore((jakarta.servlet.Filter) authorizationRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        }        
         return http.build();
     }
-
+    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Allow all origins (use allowedOriginPatterns for better flexibility)
+        // Allow all origins - esto es importante para Railway y Swagger
         configuration.setAllowedOriginPatterns(List.of("*"));
         
-        // Allow all common HTTP methods
+        // Allow all common HTTP methods including OPTIONS for preflight
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"));
         
         // Allow all headers
@@ -65,6 +86,9 @@ public class WebSecurityConfig {
         
         // Set max age for preflight requests
         configuration.setMaxAge(3600L);
+        
+        // Expose headers for client access
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         
@@ -72,5 +96,11 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         
         return source;
+    }
+    
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        // This will be implemented by your authentication configuration
+        return null;
     }
 }
