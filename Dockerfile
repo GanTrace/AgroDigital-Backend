@@ -1,5 +1,12 @@
-FROM amazoncorretto:22
+FROM eclipse-temurin:22-jdk AS build
 
-COPY ./compile/AgroDigital-Backend-0.0.1-SNAPSHOT.jar /app.jar
+COPY ./ /app
+WORKDIR /app
 
-CMD ["java","-jar","/app.jar"]
+RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+
+FROM eclipse-temurin:22-jre
+
+COPY --from=build /app/target/AgroDigital-Backend-0.0.1-SNAPSHOT.jar /app.jar
+
+CMD ["java", "-jar", "/app.jar"]
