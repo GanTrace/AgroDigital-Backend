@@ -3,7 +3,7 @@ FROM eclipse-temurin:22-jdk AS build
 COPY ./ /app
 WORKDIR /app
 
-RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:22-jre
 
