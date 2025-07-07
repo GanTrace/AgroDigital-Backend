@@ -1,0 +1,8 @@
+mediafiles/*
+query/*
+README.md
+.git/*
+.idea/*
+.gitignore
+HELP.md
+target/*
